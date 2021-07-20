@@ -1,0 +1,112 @@
+There are few things to do before running the script
+
+1.	Python packages:
+•	spacy
+•	spacy-langdetect
+•	selenium
+
+2.	Selenium web driver for Google Chrome:
+•	Download link: https://chromedriver.chromium.org/downloads
+•	Need to download the driver based on the Browser version.
+
+
+
+
+
+pages = [str(i) for i in list(range(0,60,20))]  
+            for page in pages:
+                print("Page :",page)
+                url = 'https://www.indeed.com/cmp/company/reviews?fcountry=ALL&start='+page
+                driver.get(url)
+                overall_rating = driver.find_element_by_xpath('/html/body/div[2]/div/div[1]/header/div[2]/div[3]/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[2]/span[2]')
+                #print("Overall Rating : "+str(overall_rating.text))
+                for n in range(2,24,1):
+                    if n != 6 and n != 12: 
+                        #print("Number "+str(n))
+                        title = driver.find_elements_by_xpath('/html/body/div[2]/div/div[1]/main/div[2]/div[1]/div/div['+str(n)+']/div/div[2]/h2/a/span/span/span')#'.//span[@class="css-hh75in-Box eu4oa1w0"]')#'/html/body/div[2]/div/div[1]/main/div[2]/div[1]/div/div')
+                        comments = driver.find_elements_by_xpath('/html/body/div[2]/div/div[1]/main/div[2]/div[1]/div/div['+str(n)+']/div/div[2]/div[2]/span/span/span')
+                        reviewers = driver.find_elements_by_xpath('/html/body/div[2]/div/div[1]/main/div[2]/div[1]/div/div['+str(n)+']/div/div[2]/div[1]/span')
+                        user_ratings = driver.find_elements_by_xpath('/html/body/div[2]/div/div[1]/main/div[2]/div[1]/div/div['+str(n)+']/div/div[1]/div/button')
+                        pros = driver.find_elements_by_xpath('/html/body/div[2]/div/div[1]/main/div[2]/div[1]/div/div['+str(n)+']/div/div[2]/div[3]/div/div[1]/div/span/span')
+                        cons = driver.find_elements_by_xpath('/html/body/div[2]/div/div[1]/main/div[2]/div[1]/div/div['+str(n)+']/div/div[2]/div[3]/div/div[2]/div/span/span')
+                        for ti,co,re, ur in zip(title,comments, reviewers, user_ratings):
+                            Title.append(ti.text)
+                            Comment.append(co.text)
+                            rev_pos = re.text.replace("\n","")
+                            splt = rev_pos.split('Employee) -') 
+                            author = splt[0]+' Employee)'
+                            #print(f"Author : {author}")
+                            Reviewer_Position.append(author)
+                            split_2 = splt[1].split('-')
+                            #print(split_2)
+                            if len(split_2)==3:
+                                date1 = split_2[2] 
+                                location = split_2[0]+","+split_2[1]
+                            else:
+                                date1 = split_2[1]
+                                location = split_2[0]
+                            #print(f"location : {location}")
+
+                            if 'Former Employee' in author:
+                                a = 'Former Employee'
+                                Employee_Status.append(a)
+                            else:
+                                a = 'Current Employee'
+                                Employee_Status.append(a)
+
+                            # Split the job category
+                            Job_Category = [None for m in Reviewer_Position]    
+                            for i in range(len(Reviewer_Position)):
+                                text = str(Reviewer_Position[i].lower())
+                                for j in Job_Categories:
+                                    if j in text:
+                                        Job_Category[i] = j.capitalize()
+                                        if j == 'Workers':
+                                            Job_Category[i] = 'Worker'
+
+                            Original_Location.append(location)
+                            if(len(location.split(','))==1):
+                                city = location.split(',')[0]
+                                state = location.split(',')[0] 
+                            else:
+                                city= location.split(',')[0]
+                                state = location.split(',')[1]
+                            City.append(city)
+                            State.append(state)
+
+                            Date.append(date1)
+                            Rating.append(float(ur.text))
+                            Encoded_Rating.append(float(ur.text)/5*100)
+
+                        if len(pros) != 0:
+                            pr = pros[0].text
+                        else:
+                            pr = ' '
+                        Pros.append(pr)
+                        if len(cons) != 0:
+                            cn = cons[0].text
+                        else:
+                            cn = ' '
+                        Cons.append(cn)
+                        if c_name == 'Conduent':
+                            Flag.append('YES')
+                            Company.append(c_name)
+                        else:
+                            Flag.append("NO")
+                            Company.append(c_name)
+
+        self.Indeed_review = pd.DataFrame({'Title' : Title,
+                                      'Original_Rating' : Encoded_Rating,
+                                      'Reviewer_Position' : Reviewer_Position,
+                                      'Original_Location' : Original_Location,
+                                      'Date' : Date,
+                                      'Comment' : Comment,
+                                      'pros' : Pros,
+                                      'cons' : Cons,
+                                      'Employee_Status' : Employee_Status,
+                                      'City' : City,
+                                      'State' : State,
+                                      'Job_Category' : Job_Category, 
+                                      'User_Rating' : Rating,
+                                      'Flag' : Flag,
+                                      'Company' : Company})

@@ -1,4 +1,4 @@
-# webscraping_indeed
+# webscraping indeed review page
 
 There are few things to do before running the script
 

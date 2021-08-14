@@ -4,10 +4,6 @@ There are few things to do before running the script
 
 1.	Python packages:
 
-•	spacy
-
-•	spacy-langdetect
-
 •	selenium
 
 2.	Selenium web driver for Google Chrome:

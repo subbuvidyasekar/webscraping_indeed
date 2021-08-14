@@ -1,19 +1,4 @@
-There are few things to do before running the script
-
-1.	Python packages:
-•	spacy
-•	spacy-langdetect
-•	selenium
-
-2.	Selenium web driver for Google Chrome:
-•	Download link: https://chromedriver.chromium.org/downloads
-•	Need to download the driver based on the Browser version.
-
-
-
-
-
-comp_list = ['Conduent']#,'Genpact','Teleperformance']
+comp_list = ['Company1','Company2','Company3']
         for c_name in comp_list:
             pages = [str(i) for i in list(range(0,600,20))]  
             for page in pages:
@@ -21,7 +6,6 @@ comp_list = ['Conduent']#,'Genpact','Teleperformance']
                 url = 'https://www.indeed.com/cmp/'+c_name+'/reviews?fcountry=ALL&start='+page
                 driver.get(url)
                 overall_rating = driver.find_element_by_xpath('/html/body/div[2]/div/div[1]/header/div[2]/div[3]/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[2]/span[2]')
-                #print("Overall Rating : "+str(overall_rating.text))
                 for n in range(2,24,1):
                     if n != 6 and n != 12: 
                         #print("Number "+str(n))
@@ -38,7 +22,7 @@ comp_list = ['Conduent']#,'Genpact','Teleperformance']
                             splt = rev_pos.split('Employee) -') 
                             author = splt[0]+' Employee)'
                             #print(f"Author : {author}")
-                            Reviewer_Position.append(author)
+                            Reviewer_designation.append(author)
                             split_2 = splt[1].split('-')
                             #print(split_2)
                             if len(split_2)==3:
@@ -49,13 +33,13 @@ comp_list = ['Conduent']#,'Genpact','Teleperformance']
                                 location = split_2[0]
                             #print(f"location : {location}")
 
-                            Job_Category.append(author.split('(')[0])
+                            Job_Title.append(author.split('(')[0])
                             if 'Current  Employee' in author:
                                 Employee_Status.append("Current Employee")
                             else:
                                 Employee_Status.append("Former Employee")                            
                            
-                            Original_Location.append(location)
+                            Full_Location.append(location)
                             if(len(location.split(','))==1):
                                 city = location.split(',')[0]
                                 state = location.split(',')[0] 
@@ -78,24 +62,19 @@ comp_list = ['Conduent']#,'Genpact','Teleperformance']
                         else:
                             cn = ' '
                         Cons.append(cn)
-                        if c_name == 'Conduent':
-                            Flag.append('YES')
-                            Company.append(c_name)
-                        else:
-                            Flag.append("NO")
-                            Company.append(c_name)
+                        Company.append(c_name)
+                        
 
-        self.Indeed_review = pd.DataFrame({'Reviewer_Position' : Reviewer_Position,
-                                      'Job_Category' : Job_Category, 
+        comments = pd.DataFrame({'Reviewer_designation' : Reviewer_designation,
+                                      'Job_Title' : Job_Title, 
                                       'Employee_Status' : Employee_Status,
                                       'City' : City,
                                       'State' : State,
-                                      'Original_Location' : Original_Location,
+                                      'Full_Location' : Full_Location,
                                       'Date' : Date,
                                       'Title' : Title,
                                       'Comment' : Comment,
                                       'Pros' : Pros,
                                       'Cons' : Cons,
-                                      'Flag' : Flag,
-                                      'Company' : Company,
-                                      'User_Rating' : Rating})
+                                      'User_Rating' : Rating,
+                                      'Company':Company})

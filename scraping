@@ -13,10 +13,12 @@ There are few things to do before running the script
 
 
 
-pages = [str(i) for i in list(range(0,60,20))]  
+comp_list = ['Conduent']#,'Genpact','Teleperformance']
+        for c_name in comp_list:
+            pages = [str(i) for i in list(range(0,600,20))]  
             for page in pages:
                 print("Page :",page)
-                url = 'https://www.indeed.com/cmp/company/reviews?fcountry=ALL&start='+page
+                url = 'https://www.indeed.com/cmp/'+c_name+'/reviews?fcountry=ALL&start='+page
                 driver.get(url)
                 overall_rating = driver.find_element_by_xpath('/html/body/div[2]/div/div[1]/header/div[2]/div[3]/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[2]/span[2]')
                 #print("Overall Rating : "+str(overall_rating.text))
@@ -47,23 +49,12 @@ pages = [str(i) for i in list(range(0,60,20))]
                                 location = split_2[0]
                             #print(f"location : {location}")
 
-                            if 'Former Employee' in author:
-                                a = 'Former Employee'
-                                Employee_Status.append(a)
+                            Job_Category.append(author.split('(')[0])
+                            if 'Current  Employee' in author:
+                                Employee_Status.append("Current Employee")
                             else:
-                                a = 'Current Employee'
-                                Employee_Status.append(a)
-
-                            # Split the job category
-                            Job_Category = [None for m in Reviewer_Position]    
-                            for i in range(len(Reviewer_Position)):
-                                text = str(Reviewer_Position[i].lower())
-                                for j in Job_Categories:
-                                    if j in text:
-                                        Job_Category[i] = j.capitalize()
-                                        if j == 'Workers':
-                                            Job_Category[i] = 'Worker'
-
+                                Employee_Status.append("Former Employee")                            
+                           
                             Original_Location.append(location)
                             if(len(location.split(','))==1):
                                 city = location.split(',')[0]
@@ -76,7 +67,6 @@ pages = [str(i) for i in list(range(0,60,20))]
 
                             Date.append(date1)
                             Rating.append(float(ur.text))
-                            Encoded_Rating.append(float(ur.text)/5*100)
 
                         if len(pros) != 0:
                             pr = pros[0].text
@@ -95,18 +85,17 @@ pages = [str(i) for i in list(range(0,60,20))]
                             Flag.append("NO")
                             Company.append(c_name)
 
-        self.Indeed_review = pd.DataFrame({'Title' : Title,
-                                      'Original_Rating' : Encoded_Rating,
-                                      'Reviewer_Position' : Reviewer_Position,
-                                      'Original_Location' : Original_Location,
-                                      'Date' : Date,
-                                      'Comment' : Comment,
-                                      'pros' : Pros,
-                                      'cons' : Cons,
+        self.Indeed_review = pd.DataFrame({'Reviewer_Position' : Reviewer_Position,
+                                      'Job_Category' : Job_Category, 
                                       'Employee_Status' : Employee_Status,
                                       'City' : City,
                                       'State' : State,
-                                      'Job_Category' : Job_Category, 
-                                      'User_Rating' : Rating,
+                                      'Original_Location' : Original_Location,
+                                      'Date' : Date,
+                                      'Title' : Title,
+                                      'Comment' : Comment,
+                                      'Pros' : Pros,
+                                      'Cons' : Cons,
                                       'Flag' : Flag,
-                                      'Company' : Company})
+                                      'Company' : Company,
+                                      'User_Rating' : Rating})
